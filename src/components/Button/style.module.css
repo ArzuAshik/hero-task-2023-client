@@ -1,0 +1,11 @@
+.default {
+  background: gray;
+}
+
+.primary {
+  background: blue;
+}
+
+.danger {
+  background: red;
+}
