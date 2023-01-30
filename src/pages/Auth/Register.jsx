@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import * as yup from "yup";
 import { useRegisterMutation } from "../../features/auth/authApi";
 import DefaultLayout from "../../layout/DefaultLayout";
+import { errorAlert } from "../../utils";
 import styles from "./style.module.css";
 
 const initialValue = { name: "", email: "", password: "" };
+const schema = yup.object({
+  password: yup
+    .string("")
+    .required("password is required")
+    .min(8, "Password must be at least 8 characters long")
+    .matches(/[a-z]/, "Password must contain at least 1 lowercase character")
+    .matches(/[A-Z]/, "Password must contain at least 1 uppercase character"),
+  email: yup.string("").required("email is required.").email("invalid email."),
+  name: yup.string().required("name is required").min(4, "Name is too short"),
+});
 
 export default function Register() {
   const navigate = useNavigate();
@@ -13,7 +25,14 @@ export default function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleRegister(inputs);
+    schema
+      .validate(inputs)
+      .then(() => {
+        handleRegister(inputs);
+      })
+      .catch((err) => {
+        errorAlert(err?.errors[0]);
+      });
   };
 
   const handleChange = (e) => {

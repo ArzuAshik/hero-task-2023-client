@@ -1,8 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import * as yup from "yup";
 import { useLoginMutation } from "../../features/auth/authApi";
 import DefaultLayout from "../../layout/DefaultLayout";
+import { errorAlert } from "../../utils";
 import styles from "./style.module.css";
+
+const schema = yup.object({
+  email: yup.string("").email("invalid email.").required("email is required."),
+  password: yup
+    .string("")
+    .min(8, "Password must be at least 8 characters long")
+    .matches(/[a-z]/, "Password must contain at least 1 lowercase character")
+    .matches(/[A-Z]/, "Password must contain at least 1 uppercase character")
+    .required("password is required"),
+});
 
 export default function Login() {
   const [handleLogin, { isSuccess }] = useLoginMutation();
@@ -11,7 +23,14 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    handleLogin(inputs);
+    schema
+      .validate(inputs)
+      .then(() => {
+        handleLogin(inputs);
+      })
+      .catch((err) => {
+        errorAlert(err?.errors[0]);
+      });
   };
 
   const handleChange = (e) => {
