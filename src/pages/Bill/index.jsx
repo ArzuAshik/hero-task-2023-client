@@ -7,17 +7,25 @@ import Pagination from "../../components/Pagination/Pagination";
 import Table from "../../components/Table/Table";
 import { useGetBillsQuery } from "../../features/bill/billApi";
 import { setPage } from "../../features/page/pageSlice";
+import { setSearch } from "../../features/search/searchSlice";
 import DefaultLayout from "../../layout/DefaultLayout";
 import styles from "./style.module.css";
 
 export default function Bill() {
+  const [searchInput, setSearchInput] = useState("");
+
   const { page } = useSelector((state) => state.page);
+  const { search } = useSelector((state) => state.search);
   const { isFetching, isError, data } = useGetBillsQuery({
-    search: "",
+    search,
     page,
   });
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+
+  const handleSearch = () => {
+    dispatch(setSearch(searchInput));
+  };
 
   const handleClose = () => {
     setOpen(false);
@@ -25,6 +33,8 @@ export default function Bill() {
 
   const handleOpen = () => {
     dispatch(setPage(1));
+    dispatch(setSearch(""));
+    setSearchInput("");
     setOpen(true);
   };
 
@@ -49,6 +59,9 @@ export default function Bill() {
         <div className={styles.header}>
           <h3>Bill logs</h3>
           <input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onBlur={handleSearch}
             style={{
               flexGrow: 1,
               maxWidth: 400,

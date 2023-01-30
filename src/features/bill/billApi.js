@@ -1,4 +1,5 @@
-const { apiSlice } = require("../Api/apiSlice");
+import { errorAlert } from "../../utils";
+import { apiSlice } from "../Api/apiSlice";
 
 const billApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -99,8 +100,53 @@ const billApi = apiSlice.injectEndpoints({
       }),
       keepUnusedDataFor: 0.1,
     }),
+
+    deleteBill: builder.mutation({
+      query: ({ _id }) => ({
+        url: `/delete-billing/${_id}`,
+        method: "DELETE",
+      }),
+      onQueryStarted: async (arg, { queryFulfilled, dispatch }) => {
+        const { search, page, _id } = arg;
+        console.log(arg);
+        const draft = dispatch(
+          billApi.util.updateQueryData(
+            "getBills",
+            { search, page },
+            (draft) => {
+              // console.log(JSON.stringify(draft));
+              let paidAmount;
+              draft.data = draft.data.filter((item) => {
+                if (item._id !== _id) return true;
+                paidAmount = item.paidAmount;
+                return false;
+              });
+              const docCount = Number(draft.documentCount) - 1;
+              draft.paidTotal = Number(draft.paidTotal) - Number(paidAmount);
+              draft.documentCount = docCount;
+              draft.totalPage = Math.ceil(docCount / 10);
+            }
+          )
+        );
+        try {
+          const { data } = await queryFulfilled;
+          console.log(data);
+          if (!data.deletedCount) {
+            draft.undo();
+            errorAlert("Delete Failed.");
+          }
+        } catch (err) {
+          draft.undo();
+          errorAlert("Network Error! Delete Failed.");
+        }
+      },
+    }),
   }),
 });
 
-export const { useGetBillsQuery, useAddBillMutation, useUpdateBillMutation } =
-  billApi;
+export const {
+  useGetBillsQuery,
+  useAddBillMutation,
+  useUpdateBillMutation,
+  useDeleteBillMutation,
+} = billApi;

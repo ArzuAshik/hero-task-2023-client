@@ -8,8 +8,9 @@ import styles from "./style.module.css";
 
 export default function DefaultLayout({ children }) {
   const { page } = useSelector((state) => state.page);
+  const { search } = useSelector((state) => state.search);
   const { isFetching, isError, data } = useGetBillsQuery({
-    search: "",
+    search,
     page,
   });
   const { accessToken } = useSelector((state) => state.auth);

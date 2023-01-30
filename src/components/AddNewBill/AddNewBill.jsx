@@ -12,6 +12,7 @@ const initialValue = { name: "", email: "", phone: "", paidAmount: "" };
 
 export default function AddNewBill({ open, handleClose, values }) {
   const { page } = useSelector((state) => state.page);
+  const { search } = useSelector((state) => state.search);
   console.log(values);
   const [inputs, setInputs] = useState(values || initialValue);
   const [handleSave] = useAddBillMutation();
@@ -19,8 +20,8 @@ export default function AddNewBill({ open, handleClose, values }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!values) handleSave({ ...inputs, page });
-    else handleUpdate({ page, _id: values._id, body: inputs, search: "" });
+    if (!values) handleSave({ ...inputs, page, search });
+    else handleUpdate({ page, _id: values._id, body: inputs, search });
     handleClose();
   };
 
