@@ -25,7 +25,6 @@ const billApi = apiSlice.injectEndpoints({
                 (Number(draft.documentCount) + 1) / 10
               );
               draft.documentCount = Number(draft.documentCount) + 1;
-              console.log(JSON.stringify(draft));
             }
           )
         );
@@ -108,13 +107,11 @@ const billApi = apiSlice.injectEndpoints({
       }),
       onQueryStarted: async (arg, { queryFulfilled, dispatch }) => {
         const { search, page, _id } = arg;
-        console.log(arg);
         const draft = dispatch(
           billApi.util.updateQueryData(
             "getBills",
             { search, page },
             (draft) => {
-              // console.log(JSON.stringify(draft));
               let paidAmount;
               draft.data = draft.data.filter((item) => {
                 if (item._id !== _id) return true;
@@ -130,7 +127,6 @@ const billApi = apiSlice.injectEndpoints({
         );
         try {
           const { data } = await queryFulfilled;
-          console.log(data);
           if (!data.deletedCount) {
             draft.undo();
             errorAlert("Delete Failed.");

@@ -30,7 +30,6 @@ export default function Modal({ children, open, onClose }) {
     (event) => {
       if (event.key === KEY_NAME_ESC) {
         onClose();
-        console.log("escape");
       }
     },
     [onClose]

@@ -25,7 +25,6 @@ const schema = yup.object({
 export default function AddNewBill({ open, handleClose, values }) {
   const { page } = useSelector((state) => state.page);
   const { search } = useSelector((state) => state.search);
-  console.log(values);
   const [inputs, setInputs] = useState(values || initialValue);
   const [errors, setErrors] = useState("");
   const [handleSave] = useAddBillMutation();
